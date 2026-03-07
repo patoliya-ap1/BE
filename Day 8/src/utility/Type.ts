@@ -27,3 +27,9 @@ export interface EmailData {
   subject: string;
   template: string;
 }
+
+export interface SmsData {
+  body:string,
+  to:string,
+  from:string
+}

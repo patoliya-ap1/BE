@@ -12,6 +12,7 @@ import type { EmailDecodedToken } from "../utility/Type.js";
 import { smsClient } from "../services/smsService.js";
 import { Queue, connection } from "../services/bullmqConfig.js";
 import { emailQueue } from "../queue/emailQueue.js";
+import { smsQueue } from "../queue/smsQueue.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -150,6 +151,28 @@ export const signupController = async (
       const err = new AppError("error while sending verify email", 400);
       return next(err);
     }
+
+    if(rest.phoneNumber)
+    {
+      const smsSend = await smsQueue.add(
+        "sendVerificationSMS",
+        {
+          body: "Please verify your email for access resource",
+          to: rest.phoneNumber,
+          from: process.env.TWILIO_PHONE_NUMBER as string
+        },
+        { attempts: 2 },
+      );
+
+      if (!smsSend) {
+        return res.status(201).json({
+          success: true,
+          message: "signup successfully.",
+          issue: "issue in sending sms",
+        });
+      }
+    }
+
 
     // if (rest.phoneNumber) {
     //   const smsSend = await smsClient.messages.create({

@@ -1,3 +1,3 @@
-import {Queue,connection} from '../services/bullmqConfig.js'
-// welcome email que
+import { Queue, connection } from "../services/bullmqConfig.js";
+
 export const emailQueue = new Queue("emailQueue", { connection });
