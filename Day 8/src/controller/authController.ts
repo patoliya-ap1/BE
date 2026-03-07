@@ -12,6 +12,7 @@ import type { EmailDecodedToken } from "../utility/Type.js";
 import { smsClient } from "../services/smsService.js";
 import { Queue, connection } from "../services/bullmqConfig.js";
 import { emailQueue } from "../queue/emailQueue.js";
+import { smsQueue } from "../queue/smsQueue.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -134,11 +135,25 @@ export const signupController = async (
       { attempts: 2 },
     );
 
-    // const mailSend = await transporter.sendMail({
-    //   to: rest.email,
-    //   subject: "Verify Account",
-    //   html: ,
-    // });
+    if (rest.phoneNumber) {
+      const smsSend = await smsQueue.add(
+        "sendVerificationSMS",
+        {
+          body: "Please verify your email for access resource",
+          to: rest.phoneNumber,
+          from: process.env.TWILIO_PHONE_NUMBER as string,
+        },
+        { attempts: 2 },
+      );
+
+      if (!smsSend) {
+        return res.status(201).json({
+          success: true,
+          message: "signup successfully.",
+          issue: "issue in sending sms",
+        });
+      }
+    }
 
     const savedUser = await newUser.save();
     if (!savedUser) {
@@ -150,21 +165,6 @@ export const signupController = async (
       const err = new AppError("error while sending verify email", 400);
       return next(err);
     }
-
-    // if (rest.phoneNumber) {
-    //   const smsSend = await smsClient.messages.create({
-    //     body: "Please verify your email for access resource ",
-    //     to: rest.phoneNumber,
-    //     from: process.env.TWILIO_PHONE_NUMBER as string,
-    //   });
-    //   if (!smsSend) {
-    //     return res.status(201).json({
-    //       success: true,
-    //       message: "signup successfully.",
-    //       issue: "issue in sending sms",
-    //     });
-    //   }
-    // }
 
     res.status(201).json({ success: true, message: "signup successfully." });
   } catch (error) {

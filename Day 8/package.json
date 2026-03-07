@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "concurrently \"nodemon dist/index.js\" \"nodemon dist/workers/emailWorker.js\"",
+    "start:dev": "concurrently \"nodemon dist/index.js\" \"nodemon dist/workers/emailWorker.js\" \"nodemon dist/workers/smsWorker.js\"",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
