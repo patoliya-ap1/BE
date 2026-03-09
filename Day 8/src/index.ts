@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { mainRouter } from "./routes/index-route.js";
+import { logger } from "./utility/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -33,6 +34,8 @@ app.use(errorMiddleware);
 app.all("/*fallback", (req, res) => {
   res.status(404).json({ success: false, message: "api route not found" });
 });
+
+logger.info("server is running");
 
 app.listen(Port, () => {
   console.log(`Server is running on Port ${Port}`);
