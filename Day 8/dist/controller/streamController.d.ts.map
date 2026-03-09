@@ -1,1 +1,0 @@
-{"version":3,"file":"streamController.d.ts","sourceRoot":"","sources":["../../src/controller/streamController.ts"],"names":[],"mappings":"AAMA,OAAO,KAAK,EAAE,OAAO,EAAE,QAAQ,EAAE,YAAY,EAAE,MAAM,SAAS,CAAC;AAE/D,eAAO,MAAM,oBAAoB,GAC/B,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,SAqBnB,CAAC;AAEF,eAAO,MAAM,qBAAqB,GAChC,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,SAuBnB,CAAC"}
