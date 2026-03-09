@@ -1,0 +1,1 @@
+{"version":3,"file":"profileController.d.ts","sourceRoot":"","sources":["../../src/controller/profileController.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,OAAO,EAAE,QAAQ,EAAE,YAAY,EAAE,MAAM,SAAS,CAAC;AAW/D,eAAO,MAAM,wBAAwB,GACnC,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,kBAkBnB,CAAC;AAIF,eAAO,MAAM,uBAAuB,GAClC,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,kBAiFnB,CAAC"}
