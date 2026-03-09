@@ -29,3 +29,5 @@ worker.on("failed", (job, error) => {
 });
 
 console.log("Welcome SMS worker started. listening for jobs.");
+
+// error-handle
