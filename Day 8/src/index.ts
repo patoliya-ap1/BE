@@ -9,6 +9,7 @@ import { logger } from "./utility/logger.js";
 import helmet from "helmet";
 import { limiter } from "./utility/rate-limit.js";
 import { updatePostLikesCount } from "./utility/updatePostLikesCount.js";
+import cron from "node-cron";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,7 +52,11 @@ app.all("/*fallback", (req, res) => {
 });
 
 // update like count
-// updatePostLikesCount();
+
+cron.schedule("* * */12 * * *", () => {
+  console.log("update like every 12 hour");
+  updatePostLikesCount();
+});
 
 logger.info("server is running");
 
