@@ -3,6 +3,7 @@ import {
   addPostsController,
   deletePostsController,
   getPostsController,
+  likePostsController,
   updatePostsController,
 } from "../../controller/postsController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
@@ -15,6 +16,9 @@ postsRouter.get("/", getPostsController);
 
 // post
 postsRouter.post("/", addPostsController);
+
+// like
+postsRouter.post("/like/:id", likePostsController);
 
 // put
 postsRouter.put("/:id", updatePostsController);

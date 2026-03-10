@@ -8,6 +8,7 @@ import { mainRouter } from "./routes/index-route.js";
 import { logger } from "./utility/logger.js";
 import helmet from "helmet";
 import { limiter } from "./utility/rate-limit.js";
+import { updatePostLikesCount } from "./utility/updatePostLikesCount.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -48,6 +49,9 @@ app.use(errorMiddleware);
 app.all("/*fallback", (req, res) => {
   res.status(404).json({ success: false, message: "api route not found" });
 });
+
+// update like count
+// updatePostLikesCount();
 
 logger.info("server is running");
 

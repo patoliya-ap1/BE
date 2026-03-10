@@ -1,3 +1,4 @@
+import { LikeModel } from "../models/likes.model.js";
 import { PostModel } from "../models/posts.model.js";
 import { AppError } from "../utility/AppError.js";
 import type { Request, Response, NextFunction } from "express";
@@ -89,6 +90,37 @@ export const deletePostsController = async (
       message: "post deleted successfully.",
       deletedPost,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const likePostsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const postId = req.params.id || "";
+  const { userId } = req.body;
+  try {
+    const alreadyLiked = await LikeModel.findOne({ postId, userId });
+
+    if (alreadyLiked) {
+      return res.status(409).json({
+        success: true,
+        message: `you already like this post ${postId}`,
+      });
+    }
+
+    const newLike = new LikeModel({ postId, userId });
+    const savedLike = await newLike.save();
+    if (!savedLike) {
+      const err = new AppError("error while like post", 400);
+      return next(err);
+    }
+    res
+      .status(201)
+      .json({ success: true, message: `you liked this post ${postId}` });
   } catch (error) {
     next(error);
   }
