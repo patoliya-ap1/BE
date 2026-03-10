@@ -10,6 +10,7 @@ import { dirname } from "path";
 import type { EmailDecodedToken } from "../utility/Type.js";
 import { emailQueue } from "../queue/emailQueue.js";
 import { smsQueue } from "../queue/smsQueue.js";
+import { validationResult } from "express-validator";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,6 +24,14 @@ export const loginController = async (
 ) => {
   const { email, password } = req.body;
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMsg = errors.array()[0]?.msg;
+
+      const err = new AppError(errorMsg, 400);
+      return next(err);
+    }
+
     const isUserExist = await SignUpModel.findOne({ email });
     if (!isUserExist) {
       const err = new AppError(`user not found with email ${email}`, 404);
@@ -122,6 +131,12 @@ export const signupController = async (
         </body>
         </html>`;
 
+    const savedUser = await newUser.save();
+    if (!savedUser) {
+      const err = new AppError("error while signup", 400);
+      return next(err);
+    }
+
     const mailSend = await emailQueue.add(
       "sendVerificationEmail",
       {
@@ -150,12 +165,6 @@ export const signupController = async (
           issue: "issue in sending sms",
         });
       }
-    }
-
-    const savedUser = await newUser.save();
-    if (!savedUser) {
-      const err = new AppError("error while signup", 400);
-      return next(err);
     }
 
     if (!mailSend) {
