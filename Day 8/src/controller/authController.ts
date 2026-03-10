@@ -7,10 +7,7 @@ import sharp from "sharp";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { transporter } from "../services/emailService.js";
 import type { EmailDecodedToken } from "../utility/Type.js";
-import { smsClient } from "../services/smsService.js";
-import { Queue, connection } from "../services/bullmqConfig.js";
 import { emailQueue } from "../queue/emailQueue.js";
 import { smsQueue } from "../queue/smsQueue.js";
 
@@ -24,7 +21,7 @@ export const loginController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
   try {
     const isUserExist = await SignUpModel.findOne({ email });
     if (!isUserExist) {
@@ -45,7 +42,7 @@ export const loginController = async (
     const accessToken = jwt.sign(
       {
         email,
-        role: isUserExist.role || "",
+        role: isUserExist.role || "user",
         emailConfirmed: isUserExist.emailConfirmed,
       },
       JWT_SECRET,
@@ -217,9 +214,6 @@ export const updateProfileController = async (
     next(error);
   }
 };
-
-// welcome email que
-// const emailQueue = new Queue("emailQueue", { connection });
 
 export const emailTokenVerifyController = async (
   req: Request,
