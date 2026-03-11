@@ -58,7 +58,7 @@ eventEmitter.on("user.signup", welcomeEmailJob);
 
 // update like count
 
-cron.schedule("* * */12 * * *", () => {
+cron.schedule("0 */12 * * *", () => {
   console.log("update like every 12 hour");
   updatePostLikesCount();
 });

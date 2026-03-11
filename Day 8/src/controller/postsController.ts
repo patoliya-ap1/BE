@@ -1,5 +1,6 @@
 import { LikeModel } from "../models/likes.model.js";
 import { PostModel } from "../models/posts.model.js";
+import { publisher } from "../services/redisPublisher.js";
 import { AppError } from "../utility/AppError.js";
 import type { Request, Response, NextFunction } from "express";
 
@@ -10,6 +11,7 @@ export const getPostsController = async (
 ) => {
   try {
     const posts = await PostModel.find();
+    await publisher.publish("welcome-email", "user.signup");
     if (!posts) {
       const err = new AppError("error while fetching post", 400);
       return next(err);
