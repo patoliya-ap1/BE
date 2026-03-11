@@ -1,3 +1,4 @@
+import { title } from "process";
 import { LikeModel } from "../models/likes.model.js";
 import { PostModel } from "../models/posts.model.js";
 import { AppError } from "../utility/AppError.js";
@@ -8,15 +9,40 @@ export const getPostsController = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const q = (req.query.q as string) || "";
+  const sortQuery = (req.query.sort as string) || "desc";
+  const sortByDate = sortQuery === "desc" ? -1 : 1;
+  const tags = (req.query.tags as string[]) || [];
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 6;
+  const skip = (page - 1) * limit;
+
+  const filterObj = {} as { title: {}; tags: string[] };
+
+  if (q) {
+    filterObj.title = { $regex: q, $options: "i" };
+  }
+  if (tags.length > 0) {
+    filterObj.tags = tags;
+  }
+
   try {
-    const posts = await PostModel.find();
+    const totalPosts = await PostModel.find().countDocuments();
+    const posts = await PostModel.find(filterObj)
+      .sort({ createdAt: sortByDate })
+      .skip(skip)
+      .limit(limit);
     if (!posts) {
       const err = new AppError("error while fetching post", 400);
       return next(err);
     }
-    res
-      .status(200)
-      .json({ success: true, message: "posts fetched successfully.", posts });
+    res.status(200).json({
+      success: true,
+      message: "posts fetched successfully.",
+      totalPosts,
+      currentPage: page,
+      posts,
+    });
   } catch (error) {
     next(error);
   }
