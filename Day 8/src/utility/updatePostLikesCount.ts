@@ -17,7 +17,7 @@ export const updatePostLikesCount = async () => {
         throw new Error("error while updating post");
       }
     });
-    logger.info("like updated successfully after 10 sec");
+    logger.info("like updated successfully after 12 hour");
   } catch (error: any) {
     logger.error(error.message || "unknown error while update likes");
   }

@@ -11,6 +11,7 @@ import type { EmailDecodedToken } from "../utility/Type.js";
 import { emailQueue } from "../queue/emailQueue.js";
 import { smsQueue } from "../queue/smsQueue.js";
 import { validationResult } from "express-validator";
+import { eventEmitter } from "../services/eventEmitter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -250,15 +251,11 @@ export const emailTokenVerifyController = async (
       return next(err);
     }
 
-    await emailQueue.add(
-      "sendWelcomeEmail",
-      {
-        email: decodeToken.email,
-        subject: "welcome message",
-        template: `<h1>Welcome message</h1>`,
-      },
-      { attempts: 2 },
-    );
+    eventEmitter.emit("user.signup", {
+      email: "patoliya.ap1@gmail.com",
+      subject: "welcome message",
+      template: `<h1>Welcome to Company</h1>`,
+    });
 
     res.status(200).json({
       success: true,

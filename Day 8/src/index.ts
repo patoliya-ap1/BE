@@ -10,6 +10,9 @@ import helmet from "helmet";
 import { limiter } from "./utility/rate-limit.js";
 import { updatePostLikesCount } from "./utility/updatePostLikesCount.js";
 import cron from "node-cron";
+import { eventEmitter } from "./services/eventEmitter.js";
+import { emailQueue } from "./queue/emailQueue.js";
+import { welcomeEmailJob } from "./utility/welcomeEmailJob.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -50,6 +53,8 @@ app.use(errorMiddleware);
 app.all("/*fallback", (req, res) => {
   res.status(404).json({ success: false, message: "api route not found" });
 });
+
+eventEmitter.on("user.signup", welcomeEmailJob);
 
 // update like count
 
