@@ -54,6 +54,8 @@ app.all("/*fallback", (req, res) => {
   res.status(404).json({ success: false, message: "api route not found" });
 });
 
+// welcome email event emitter
+
 eventEmitter.on("user.signup", welcomeEmailJob);
 
 // update like count

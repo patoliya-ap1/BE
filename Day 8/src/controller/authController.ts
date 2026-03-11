@@ -12,6 +12,7 @@ import { emailQueue } from "../queue/emailQueue.js";
 import { smsQueue } from "../queue/smsQueue.js";
 import { validationResult } from "express-validator";
 import { eventEmitter } from "../services/eventEmitter.js";
+import { publisher } from "../services/redisPublisher.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -251,11 +252,16 @@ export const emailTokenVerifyController = async (
       return next(err);
     }
 
-    eventEmitter.emit("user.signup", {
-      email: "patoliya.ap1@gmail.com",
-      subject: "welcome message",
-      template: `<h1>Welcome to Company</h1>`,
+    const eventData = JSON.stringify({
+      event: "user.signup",
+      payload: {
+        email: decodeToken.email,
+        subject: "welcome message",
+        template: `<h1>Welcome to Company</h1>`,
+      },
     });
+
+    await publisher.publish("welcome-email", eventData);
 
     res.status(200).json({
       success: true,
