@@ -16,6 +16,7 @@ export const signupValidator = [
     .isLength({ min: 8, max: 10 })
     .withMessage("Password must be between 8 to 10 character long"),
   body("phoneNumber")
+    .optional()
     .isMobilePhone("en-IN", { strictMode: true })
     .withMessage("Invalid Phone number"),
 ];
