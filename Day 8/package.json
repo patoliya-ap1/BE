@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "concurrently \"nodemon dist/index.js\" \"nodemon dist/workers/emailWorker.js\" \"nodemon dist/workers/smsWorker.js\"",
+    "start:dev": "concurrently \"nodemon dist/app.js\" \"nodemon dist/workers/emailWorker.js\" \"nodemon dist/workers/smsWorker.js\"",
     "build": "tsc",
-    "dev": "concurrently \"nodemon src/index.js\" \"nodemon src/workers/emailWorker.js\" \"nodemon src/workers/smsWorker.js\"",
+    "dev": "concurrently \"nodemon src/app.js\" \"nodemon src/workers/emailWorker.js\" \"nodemon src/workers/smsWorker.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

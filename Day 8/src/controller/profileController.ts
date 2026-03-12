@@ -27,7 +27,7 @@ export const getProfileByIDController = async (
 
     res.status(200).json({
       success: true,
-      message: "user fetcher successfully",
+      message: "user fetched successfully",
       user,
     });
   } catch (error) {
@@ -65,9 +65,6 @@ export const updateProfileController = async (
         (req.file?.size && Number((req.file?.size / 1024 ** 2).toFixed(2))) ||
         0;
 
-      console.log(mimetype);
-      console.log(req.file?.mimetype.split("/")[0]);
-
       if (!mimetype) {
         const err = new AppError(
           "please upload image file *jpeg , jpg , png , gif ",
@@ -78,7 +75,7 @@ export const updateProfileController = async (
 
       if (imageSize > 1) {
         const err = new AppError(
-          "please upload image size less than 1 MB ",
+          "please upload image size less than 1 MB",
           400,
         );
         return next(err);
@@ -86,6 +83,7 @@ export const updateProfileController = async (
 
       const compressedPath = path.join(
         __dirname,
+        "..",
         "assets",
         "compressedImages",
         `${isUserExist.profilePicture ? isUserExist.profilePicture.split("/").at(-1) : `profile-${Date.now()}.jpg`}`,
