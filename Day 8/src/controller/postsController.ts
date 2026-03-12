@@ -1,6 +1,6 @@
-import { title } from "process";
 import { LikeModel } from "../models/likes.model.js";
 import { PostModel } from "../models/posts.model.js";
+import { redisCacheClient } from "../services/redis.connect.js";
 import { AppError } from "../utility/AppError.js";
 import type { Request, Response, NextFunction } from "express";
 
@@ -17,13 +17,13 @@ export const getPostsController = async (
   const limit = parseInt(req.query.limit as string) || 6;
   const skip = (page - 1) * limit;
 
-  const filterObj = {} as { title: {}; tags: string[] };
+  const filterObj = {} as { title: {}; tags: {} };
 
   if (q) {
     filterObj.title = { $regex: q, $options: "i" };
   }
   if (tags.length > 0) {
-    filterObj.tags = tags;
+    filterObj.tags = { $in: tags };
   }
 
   try {
@@ -36,12 +36,32 @@ export const getPostsController = async (
       const err = new AppError("error while fetching post", 400);
       return next(err);
     }
+
+    const resObject = {
+      success: true,
+      message: "posts fetched successfully.",
+      totalPosts,
+      currentPage: page,
+      posts: JSON.stringify(posts),
+    };
+
+    // add caching for tags
+    if (tags.length > 0 || q || page || sortQuery) {
+      const cacheKey = JSON.stringify(req.query);
+
+      await redisCacheClient.set(cacheKey, JSON.stringify(resObject), {
+        expiration: { type: "EX", value: 60 * 60 },
+      });
+      console.log("caching successfully for tags");
+    }
+
     res.status(200).json({
       success: true,
       message: "posts fetched successfully.",
       totalPosts,
       currentPage: page,
       posts,
+      from: "mongodb database",
     });
   } catch (error) {
     next(error);

@@ -8,11 +8,11 @@ import {
 } from "../../controller/postsController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { roleBaseMiddleware } from "../../middleware/roleBaseMiddleware.js";
-import { verifiedUserMiddleware } from "../../middleware/verifiedUserMiddleware.js";
+import { postCacheMiddleware } from "../../middleware/postsCacheMiddleware.js";
 export const postsRouter = express.Router();
 
 // get
-postsRouter.get("/", getPostsController);
+postsRouter.get("/", postCacheMiddleware, getPostsController);
 
 // post
 postsRouter.post("/", addPostsController);

@@ -11,13 +11,14 @@ import { limiter } from "./utility/rate-limit.js";
 import { updatePostLikesCount } from "./utility/updatePostLikesCount.js";
 import cron from "node-cron";
 import { eventEmitter } from "./services/eventEmitter.js";
-import { emailQueue } from "./queue/emailQueue.js";
 import { welcomeEmailJob } from "./utility/welcomeEmailJob.js";
+import { initializeRedisCache } from "./services/redis.connect.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 initializeDatabase();
+initializeRedisCache()
 const Port = process.env.PORT || 7000;
 const app = express();
 app.use(express.json());
