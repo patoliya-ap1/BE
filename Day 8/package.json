@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "clean": "rimraf dist && rimraf build",
+    "copy-assets": "copyfiles -u 1 src/assets/**/* dist/",
     "start:dev": "concurrently \"nodemon dist/app.js\" \"nodemon dist/workers/emailWorker.js\" \"nodemon dist/workers/smsWorker.js\"",
-    "build": "tsc",
+    "build": "npm run clean && tsc && npm run copy-assets",
     "dev": "concurrently \"nodemon src/app.js\" \"nodemon src/workers/emailWorker.js\" \"nodemon src/workers/smsWorker.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -39,6 +41,8 @@
     "@types/node": "^25.3.3",
     "@types/nodemailer": "^7.0.11",
     "concurrently": "^9.2.1",
+    "copyfiles": "^2.4.1",
+    "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
