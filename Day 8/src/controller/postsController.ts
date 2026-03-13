@@ -1,6 +1,6 @@
 import { LikeModel } from "../models/likes.model.js";
 import { PostModel } from "../models/posts.model.js";
-import { redisCacheClient } from "../services/redis.connect.js";
+import { redisCacheClient } from "../services/redisCacheClient.js";
 import { AppError } from "../utility/AppError.js";
 import type { Request, Response, NextFunction } from "express";
 
@@ -48,7 +48,7 @@ export const getPostsController = async (
       success: true,
       message: "posts fetched successfully.",
       totalPosts,
-      currentPage: page,
+      currentPage: page || 1,
       posts: JSON.stringify(posts),
     };
 

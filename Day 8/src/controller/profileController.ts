@@ -10,6 +10,8 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const BACKEND_URL = process.env.BACKEND_URL;
+
 // get profile by id
 
 export const getProfileByIDController = async (
@@ -93,7 +95,7 @@ export const updateProfileController = async (
         .jpeg({ quality: 70 })
         .toFile(compressedPath);
       const imageNameWithExtension = path.basename(compressedPath);
-      const imgUrl = `http://localhost:8000/images/${imageNameWithExtension}`;
+      const imgUrl = `${BACKEND_URL}/images/${imageNameWithExtension}`;
       updateData.profilePicture = imgUrl;
     }
 
