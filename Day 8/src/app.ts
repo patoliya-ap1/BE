@@ -10,7 +10,7 @@ import helmet from "helmet";
 import { limiter } from "./utility/rate-limit.js";
 import { eventEmitter } from "./services/eventEmitter.js";
 import { welcomeEmailJob } from "./utility/welcomeEmailJob.js";
-import { initializeRedisCache } from "./services/redis.connect.js";
+import { initializeRedisCache } from "./services/redisCacheClient.js";
 import { scheduleUpdateLikeCount } from "./utility/scheduleUpdateLikeCount.js";
 
 const __filename = fileURLToPath(import.meta.url);
