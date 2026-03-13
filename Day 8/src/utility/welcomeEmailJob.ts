@@ -1,7 +1,10 @@
 import { emailQueue } from "../queue/emailQueue.js";
 
-export const welcomeEmailJob = async (jobData:{email:string,subject:string,template:string}) => {
-  console.log(jobData);
+export const welcomeEmailJob = async (jobData: {
+  email: string;
+  subject: string;
+  template: string;
+}) => {
   try {
     await emailQueue.add(
       "sendWelcomeEmail",
@@ -16,4 +19,4 @@ export const welcomeEmailJob = async (jobData:{email:string,subject:string,templ
   } catch (error) {
     console.log("Failed to add Welcome email job to queue");
   }
-}
+};
