@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@eslint/js": "^10.0.1",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.70.4",
     "dotenv": "^17.3.1",
