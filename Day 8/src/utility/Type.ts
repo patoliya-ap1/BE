@@ -29,7 +29,7 @@ export interface EmailData {
 }
 
 export interface SmsData {
-  body:string,
-  to:string,
-  from:string
+  body: string;
+  to: string;
+  from: string;
 }
