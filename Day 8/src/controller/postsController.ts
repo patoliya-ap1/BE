@@ -19,7 +19,12 @@ export const getPostsController = async (
   const limit = parseInt(req.query.limit as string) || 6;
   const skip = ((page || 1) - 1) * limit;
 
-  const filterObj = {} as { title: {}; tags: {} };
+  type FIlter = {
+    title?: Record<string, unknown>;
+    tags?: Record<string, unknown>;
+  };
+
+  const filterObj: FIlter = {};
 
   if (q) {
     filterObj.title = { $regex: q, $options: "i" };
