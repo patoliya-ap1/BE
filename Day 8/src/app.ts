@@ -12,15 +12,39 @@ import { eventEmitter } from "./services/eventEmitter.js";
 import { welcomeEmailJob } from "./utility/welcomeEmailJob.js";
 import { initializeRedisCache } from "./services/redisCacheClient.js";
 import { scheduleUpdateLikeCount } from "./utility/scheduleUpdateLikeCount.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const Port = process.env.PORT || 7000;
+const app = express();
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "My API Documentation",
+      version: "1.0.0",
+      description: "A simple Express API with Swagger documentation",
+    },
+    servers: [
+      {
+        url: `http://localhost:${Port}`,
+      },
+    ],
+  },
+  apis: ["./routes/**/*.js"],
+};
+
+const specs = swaggerJsdoc(options);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
 initializeDatabase();
 initializeRedisCache();
 
-const Port = process.env.PORT || 7000;
-const app = express();
 app.use(express.json());
 
 //  HTTP security headers
@@ -29,6 +53,15 @@ app.use(helmet());
 // limiter
 app.use(limiter);
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Returns Home
+ *     responses:
+ *       200:
+ *         description: Home Success
+ */
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to mongodb crud Node.js server" });
 });
