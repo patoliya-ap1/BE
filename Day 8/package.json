@@ -10,7 +10,8 @@
     "clean": "rimraf dist && rimraf build",
     "copy-assets": "copyfiles -u 1 src/assets/**/* dist/",
     "start:dev": "concurrently \"nodemon dist/app.js\" \"nodemon dist/workers/emailWorker.js\" \"nodemon dist/workers/smsWorker.js\"",
-    "build": "npm run clean && tsc && npm run copy-assets",
+    "build": "tsc",
+    "build:deploy": "npm run clean && tsc && npm run copy-assets",
     "dev": "concurrently \"nodemon src/app.js\" \"nodemon src/workers/emailWorker.js\" \"nodemon src/workers/smsWorker.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
