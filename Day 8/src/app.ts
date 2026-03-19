@@ -13,33 +13,16 @@ import { welcomeEmailJob } from "./utility/welcomeEmailJob.js";
 import { initializeRedisCache } from "./services/redisCacheClient.js";
 import { scheduleUpdateLikeCount } from "./utility/scheduleUpdateLikeCount.js";
 import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
+import { specs } from "./utility/swagger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const Port = process.env.PORT || 7000;
+
 const app = express();
 
-const options = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "My API Documentation",
-      version: "1.0.0",
-      description: "A simple Express API with Swagger documentation",
-    },
-    servers: [
-      {
-        url: `http://localhost:${Port}`,
-      },
-    ],
-  },
-  apis: ["./routes/**/*.js"],
-};
-
-const specs = swaggerJsdoc(options);
-
+// swagger docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 initializeDatabase();
@@ -57,10 +40,21 @@ app.use(limiter);
  * @swagger
  * /:
  *   get:
- *     summary: Returns Home
+ *     summary: Home route
+ *     tags:
+ *       - Home
+ *     description: Welcomes the user to the Node.js server with MongoDB CRUD functionality.
  *     responses:
- *       200:
- *         description: Home Success
+ *       '200':
+ *         description: A successful response with a welcome message.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Welcome to mongodb crud Node.js server
  */
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to mongodb crud Node.js server" });
