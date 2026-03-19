@@ -1,6 +1,6 @@
 import { LikeModel } from "../models/likes.model.js";
 import { PostModel } from "../models/posts.model.js";
-import { redisCacheClient } from "../services/redis.connect.js";
+import { redisCacheClient } from "../services/redisCacheClient.js";
 import { AppError } from "../utility/AppError.js";
 import type { Request, Response, NextFunction } from "express";
 
@@ -19,7 +19,12 @@ export const getPostsController = async (
   const limit = parseInt(req.query.limit as string) || 6;
   const skip = ((page || 1) - 1) * limit;
 
-  const filterObj = {} as { title: {}; tags: {} };
+  type FIlter = {
+    title?: Record<string, unknown>;
+    tags?: Record<string, unknown>;
+  };
+
+  const filterObj: FIlter = {};
 
   if (q) {
     filterObj.title = { $regex: q, $options: "i" };
@@ -48,7 +53,7 @@ export const getPostsController = async (
       success: true,
       message: "posts fetched successfully.",
       totalPosts,
-      currentPage: page,
+      currentPage: page || 1,
       posts: JSON.stringify(posts),
     };
 
