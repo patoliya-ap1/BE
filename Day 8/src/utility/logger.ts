@@ -1,4 +1,5 @@
-import { createLogger, format, transports } from "winston";
+import winston, { createLogger, format, transports } from "winston";
+
 import DailyRotateFile from "winston-daily-rotate-file";
 
 const transport = new DailyRotateFile({
@@ -11,6 +12,11 @@ const transport = new DailyRotateFile({
 
 export const logger = createLogger({
   level: "info",
-  format: format.json(),
+  format: format.combine(
+    winston.format.timestamp({
+      format: "DD-MM-YYYY HH:mm:ss",
+    }),
+    winston.format.json(),
+  ),
   transports: [transport, new transports.Console()],
 });

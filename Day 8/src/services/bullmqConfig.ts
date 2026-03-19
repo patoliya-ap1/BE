@@ -2,9 +2,10 @@ import dotenv from "dotenv";
 import { Queue, Worker } from "bullmq";
 dotenv.config();
 
+const REDIS_URL = process.env.REDIS_URL;
+
 const connection = {
-  host: process.env.REDIS_HOST || "localhost",
-  port: parseInt(process.env.REDIS_PORT || "") || 6379,
+  url: REDIS_URL || "redis://localhost:6379",
 };
 
 export { connection, Queue, Worker };
