@@ -3,7 +3,7 @@ import { transporter } from "../services/emailService.js";
 import type { EmailData } from "../utility/Type.js";
 
 const sendEmail = async (emailData: EmailData) => {
-  const mailSend = await transporter.sendMail({
+  await transporter.sendMail({
     to: emailData.email,
     subject: emailData.subject,
     html: emailData.template,
