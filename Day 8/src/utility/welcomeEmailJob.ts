@@ -17,6 +17,6 @@ export const welcomeEmailJob = async (jobData: {
     );
     console.log("Welcome email job added to queue");
   } catch (error) {
-    console.log("Failed to add Welcome email job to queue");
+    console.log("Failed to add Welcome email job to queue", error);
   }
 };

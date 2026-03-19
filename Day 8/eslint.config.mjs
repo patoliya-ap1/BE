@@ -1,11 +1,32 @@
+// eslint.config.js
+import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import prettierConfig from "eslint-config-prettier/flat";
-import prettierPlugin from "eslint-plugin-prettier";
+import prettier from "eslint-plugin-prettier/recommended";
 
 export default tseslint.config(
+  // Start with recommended JavaScript rules
+  eslint.configs.recommended,
+
+  // Add TypeScript-specific rules
+  ...tseslint.configs.recommended,
+
+  // Configure language options for all files
   {
-    plugins: { prettier: prettierPlugin },
-    rules: { "prettier/prettier": "error" },
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.json",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+    },
   },
-  prettierConfig,
+
+  prettier,
+
+  // Ignore patterns
+  {
+    ignores: ["dist/", "build/", "node_modules/", "eslint.config.mjs"],
+  },
 );

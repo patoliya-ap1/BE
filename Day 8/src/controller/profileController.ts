@@ -90,7 +90,7 @@ export const updateProfileController = async (
         "compressedImages",
         `${isUserExist.profilePicture ? isUserExist.profilePicture.split("/").at(-1) : `profile-${Date.now()}.jpg`}`,
       );
-      const compressedImage = await sharp(imageFile)
+      await sharp(imageFile)
         .resize(400, 400)
         .jpeg({ quality: 70 })
         .toFile(compressedPath);
