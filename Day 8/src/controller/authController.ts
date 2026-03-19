@@ -10,13 +10,14 @@ import { dirname } from "path";
 import type { EmailDecodedToken } from "../utility/Type.js";
 import { emailQueue } from "../queue/emailQueue.js";
 import { smsQueue } from "../queue/smsQueue.js";
-import { validationResult } from "express-validator";
-import { eventEmitter } from "../services/eventEmitter.js";
+import { publisher } from "../services/redisPublisher.js";
+import { generateEmailTemplate } from "../utility/generateEmailTemplate.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export const loginController = async (
   req: Request,
@@ -25,19 +26,13 @@ export const loginController = async (
 ) => {
   const { email, password } = req.body;
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const errorMsg = errors.array()[0]?.msg;
-
-      const err = new AppError(errorMsg, 400);
-      return next(err);
-    }
-
     const isUserExist = await SignUpModel.findOne({ email });
     if (!isUserExist) {
       const err = new AppError(`user not found with email ${email}`, 404);
       return next(err);
     }
+
+    // compare password
     const passwordMatch = await bcrypt.compare(password, isUserExist.password);
 
     if (!passwordMatch) {
@@ -78,6 +73,7 @@ export const signupController = async (
       const err = new AppError("password is required", 400);
       return next(err);
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = new SignUpModel({ ...rest, password: hashedPassword });
@@ -86,51 +82,9 @@ export const signupController = async (
       expiresIn: "24h",
     });
 
-    const url = `http://localhost:8000/auth/verify/${emailVerifyToken}`;
+    const url = `${BACKEND_URL}/auth/verify/${emailVerifyToken}`;
 
-    const template = `<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <title>Email Verification</title>
-            <style>
-                .email-container {
-                    font-family: sans-serif;
-                    line-height: 1.6;
-                    color: #333;
-                    max-width: 600px;
-                    margin: 20px auto;
-                    padding: 20px;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                }
-                .verification-button {
-                    display: inline-block;
-                    padding: 10px 20px;
-                    background-color: #007bff;
-                    color: #ffffff;
-                    text-decoration: none;
-                    border-radius: 5px;
-                    margin-top: 15px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="email-container">
-                <h1>Verify Your Email Address</h1>
-                <p>Hi there,</p>
-                <p>Thank you for signing up! Please click the button below to verify your email address and activate your account:</p>
-                
-                <a href="${url}" style="color: white; class="verification-button">Verify Email</a>
-                
-                <p>If the button above does not work, please copy and paste the following link into your web browser:</p>
-                <p>
-                    <a href="${url}">${url}</a>
-                </p>
-                <p>Thanks,<br>Your Team</p>
-            </div>
-        </body>
-        </html>`;
+    const emailTemplate = generateEmailTemplate(url);
 
     const savedUser = await newUser.save();
     if (!savedUser) {
@@ -143,7 +97,7 @@ export const signupController = async (
       {
         email: rest.email,
         subject: "Verify Email Address",
-        template,
+        template: emailTemplate,
       },
       { attempts: 2 },
     );
@@ -195,9 +149,7 @@ export const updateProfileController = async (
         "compressedImages",
         `profile-${Date.now()}.jpg`,
       );
-      const compressedImage = await sharp(imageFile)
-        .jpeg({ quality: 70 })
-        .toFile(compressedPath);
+      await sharp(imageFile).jpeg({ quality: 70 }).toFile(compressedPath);
       updateData.profilePicture = compressedPath;
     }
 
@@ -251,11 +203,16 @@ export const emailTokenVerifyController = async (
       return next(err);
     }
 
-    eventEmitter.emit("user.signup", {
-      email: "patoliya.ap1@gmail.com",
-      subject: "welcome message",
-      template: `<h1>Welcome to Company</h1>`,
+    const eventData = JSON.stringify({
+      event: "user.signup",
+      payload: {
+        email: decodeToken.email,
+        subject: "welcome message",
+        template: `<h1>Welcome to Company</h1>`,
+      },
     });
+
+    await publisher.publish("welcome-email", eventData);
 
     res.status(200).json({
       success: true,

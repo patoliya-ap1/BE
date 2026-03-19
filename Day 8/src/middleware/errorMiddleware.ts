@@ -1,12 +1,11 @@
 import { AppError } from "../utility/AppError.js";
-import type { Request, Response, NextFunction } from "express";
+import type { ErrorRequestHandler, Request, Response } from "express";
 import { logger } from "../utility/logger.js";
 
-export const errorMiddleware = (
-  error: any,
+export const errorMiddleware: ErrorRequestHandler = (
+  error,
   req: Request,
   res: Response,
-  next: NextFunction,
 ) => {
   error.message = error.message || "internal server error";
   error.statusCode = error.statusCode || 500;

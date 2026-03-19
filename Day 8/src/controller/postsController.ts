@@ -1,5 +1,6 @@
 import { LikeModel } from "../models/likes.model.js";
 import { PostModel } from "../models/posts.model.js";
+import { redisCacheClient } from "../services/redisCacheClient.js";
 import { AppError } from "../utility/AppError.js";
 import type { Request, Response, NextFunction } from "express";
 
@@ -8,15 +9,75 @@ export const getPostsController = async (
   res: Response,
   next: NextFunction,
 ) => {
+  // query pagination and filters
+
+  const q = (req.query.q as string) || "";
+  const sortQuery = req.query.sort as string;
+  const sortByDate = sortQuery === "desc" ? -1 : sortQuery === "asc" ? 1 : "";
+  const tags = (req.query.tags as string[]) || [];
+  const page = parseInt(req.query.page as string);
+  const limit = parseInt(req.query.limit as string) || 6;
+  const skip = ((page || 1) - 1) * limit;
+
+  type FIlter = {
+    title?: Record<string, unknown>;
+    tags?: Record<string, unknown>;
+  };
+
+  const filterObj: FIlter = {};
+
+  if (q) {
+    filterObj.title = { $regex: q, $options: "i" };
+  }
+  if (tags.length > 0) {
+    filterObj.tags = { $in: tags };
+  }
+
   try {
-    const posts = await PostModel.find();
+    // total posts
+    const totalPosts = await PostModel.find().countDocuments();
+
+    // allPosts / filtered post
+    const posts = await PostModel.find(filterObj)
+      .sort({ createdAt: sortByDate || -1 })
+      .skip(skip || 0)
+      .limit(limit);
     if (!posts) {
       const err = new AppError("error while fetching post", 400);
       return next(err);
     }
-    res
-      .status(200)
-      .json({ success: true, message: "posts fetched successfully.", posts });
+
+    // add redis caching for filters
+
+    const resObjectForCaching = {
+      success: true,
+      message: "posts fetched successfully.",
+      totalPosts,
+      currentPage: page || 1,
+      posts: JSON.stringify(posts),
+    };
+
+    if (tags.length > 0 || q || page || sortQuery) {
+      const cacheKey = JSON.stringify(req.query);
+
+      await redisCacheClient.set(
+        cacheKey,
+        JSON.stringify(resObjectForCaching),
+        {
+          expiration: { type: "EX", value: 60 * 60 },
+        },
+      );
+      console.log("caching successfully for filters");
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "posts fetched successfully.",
+      totalPosts,
+      currentPage: page || 1,
+      posts,
+      from: "mongodb database",
+    });
   } catch (error) {
     next(error);
   }
