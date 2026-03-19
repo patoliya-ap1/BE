@@ -1,13 +1,3 @@
-declare global {
-  namespace Express {
-    interface Request {
-      email?: string;
-      role?: string;
-      emailConfirmed?: string;
-    }
-  }
-}
-
 export interface DecodedToken {
   email?: string;
   role?: string;
@@ -29,7 +19,7 @@ export interface EmailData {
 }
 
 export interface SmsData {
-  body:string,
-  to:string,
-  from:string
+  body: string;
+  to: string;
+  from: string;
 }

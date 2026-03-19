@@ -1,4 +1,4 @@
-import { redisCacheClient } from "../services/redis.connect.js";
+import { redisCacheClient } from "../services/redisCacheClient.js";
 import type { Request, Response, NextFunction } from "express";
 
 export const postCacheMiddleware = async (
