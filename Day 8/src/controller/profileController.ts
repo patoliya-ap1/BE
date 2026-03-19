@@ -10,6 +10,8 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const BACKEND_URL = process.env.BACKEND_URL;
+
 // get profile by id
 
 export const getProfileByIDController = async (
@@ -27,7 +29,7 @@ export const getProfileByIDController = async (
 
     res.status(200).json({
       success: true,
-      message: "user fetcher successfully",
+      message: "user fetched successfully",
       user,
     });
   } catch (error) {
@@ -65,9 +67,6 @@ export const updateProfileController = async (
         (req.file?.size && Number((req.file?.size / 1024 ** 2).toFixed(2))) ||
         0;
 
-      console.log(mimetype);
-      console.log(req.file?.mimetype.split("/")[0]);
-
       if (!mimetype) {
         const err = new AppError(
           "please upload image file *jpeg , jpg , png , gif ",
@@ -78,7 +77,7 @@ export const updateProfileController = async (
 
       if (imageSize > 1) {
         const err = new AppError(
-          "please upload image size less than 1 MB ",
+          "please upload image size less than 1 MB",
           400,
         );
         return next(err);
@@ -86,16 +85,17 @@ export const updateProfileController = async (
 
       const compressedPath = path.join(
         __dirname,
+        "..",
         "assets",
         "compressedImages",
         `${isUserExist.profilePicture ? isUserExist.profilePicture.split("/").at(-1) : `profile-${Date.now()}.jpg`}`,
       );
-      const compressedImage = await sharp(imageFile)
+      await sharp(imageFile)
         .resize(400, 400)
         .jpeg({ quality: 70 })
         .toFile(compressedPath);
       const imageNameWithExtension = path.basename(compressedPath);
-      const imgUrl = `http://localhost:8000/images/${imageNameWithExtension}`;
+      const imgUrl = `${BACKEND_URL}/images/${imageNameWithExtension}`;
       updateData.profilePicture = imgUrl;
     }
 
