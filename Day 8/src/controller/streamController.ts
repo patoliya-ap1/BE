@@ -11,7 +11,13 @@ export const streamTextController = (
   res: Response,
   next: NextFunction,
 ) => {
-  const textFilePath = path.join(__dirname, "assets", "file", "largeText.txt");
+  const textFilePath = path.join(
+    __dirname,
+    "..",
+    "assets",
+    "file",
+    "largeText.txt",
+  );
 
   const readStream = fs.createReadStream(textFilePath, { highWaterMark: 1024 });
 
@@ -37,7 +43,13 @@ export const streamImageController = (
   res: Response,
   next: NextFunction,
 ) => {
-  const textFilePath = path.join(__dirname, "assets", "image", "jungle.jpg");
+  const textFilePath = path.join(
+    __dirname,
+    "..",
+    "assets",
+    "image",
+    "jungle.jpg",
+  );
 
   const readStream = fs.createReadStream(textFilePath, {
     highWaterMark: 64 * 1024,
