@@ -1,11 +1,11 @@
 import { AppError } from "../utility/AppError.js";
-import type { Request, Response, NextFunction } from "express";
+import type { ErrorRequestHandler, Request, Response } from "express";
+import { logger } from "../utility/logger.js";
 
-export const errorMiddleware = (
-  error: any,
+export const errorMiddleware: ErrorRequestHandler = (
+  error,
   req: Request,
   res: Response,
-  next: NextFunction,
 ) => {
   error.message = error.message || "internal server error";
   error.statusCode = error.statusCode || 500;
@@ -29,5 +29,13 @@ export const errorMiddleware = (
     const message = "JSON Web Token has expired. Try again.";
     error = new AppError(message, 400);
   }
+
+  logger.error({
+    message: error.message,
+    stack: error.stack,
+    url: req.originalUrl,
+    method: req.method,
+  });
+
   res.status(error.statusCode).json({ success: false, message: error.message });
 };
