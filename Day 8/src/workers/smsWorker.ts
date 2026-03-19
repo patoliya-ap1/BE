@@ -3,7 +3,7 @@ import { smsClient } from "../services/smsService.js";
 import type { SmsData } from "../utility/Type.js";
 
 const sendSms = async (smsData: SmsData) => {
-  const smsSend = await smsClient.messages.create({
+  await smsClient.messages.create({
     body: smsData.body,
     to: smsData.to,
     from: smsData.from,
