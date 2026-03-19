@@ -1,6 +1,5 @@
-import express from 'express'
+import express from "express";
 
-const imageRouter = express.Router()
+const imageRouter = express.Router();
 
-
-imageRouter.get("/profile")
+imageRouter.get("/profile");

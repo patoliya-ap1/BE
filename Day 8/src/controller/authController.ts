@@ -10,8 +10,6 @@ import { dirname } from "path";
 import type { EmailDecodedToken } from "../utility/Type.js";
 import { emailQueue } from "../queue/emailQueue.js";
 import { smsQueue } from "../queue/smsQueue.js";
-import { validationResult } from "express-validator";
-import { eventEmitter } from "../services/eventEmitter.js";
 import { publisher } from "../services/redisPublisher.js";
 import { generateEmailTemplate } from "../utility/generateEmailTemplate.js";
 
@@ -19,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const BACKEND_URL = process.env.BACKEND_URL
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export const loginController = async (
   req: Request,
@@ -151,9 +149,7 @@ export const updateProfileController = async (
         "compressedImages",
         `profile-${Date.now()}.jpg`,
       );
-      const compressedImage = await sharp(imageFile)
-        .jpeg({ quality: 70 })
-        .toFile(compressedPath);
+      await sharp(imageFile).jpeg({ quality: 70 }).toFile(compressedPath);
       updateData.profilePicture = compressedPath;
     }
 
